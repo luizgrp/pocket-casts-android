@@ -38,6 +38,7 @@ import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
 import au.com.shiftyjelly.pocketcasts.compose.components.FormField
+import com.google.android.horologist.auth.ui.googlesignin.signin.GoogleSignInScreen
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
@@ -46,13 +47,30 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val authenticationSubGraph = "authentication_screen"
 
-private object AuthenticationRoutes {
+object AuthenticationRoutes {
     const val email = "authentication_email"
     const val password = "authentication_password"
+    const val signInPrompt = "sign_in_prompt"
+    const val googleSignIn = "google_sign_in"
 }
 
 fun NavGraphBuilder.authenticationGraph(navController: NavController) {
-    navigation(startDestination = AuthenticationRoutes.email, route = authenticationSubGraph) {
+    navigation(startDestination = AuthenticationRoutes.signInPrompt, route = authenticationSubGraph) {
+        scrollable(
+            route = AuthenticationRoutes.signInPrompt
+        ) {
+            AuthPromptScreen(
+                navController = navController,
+                columnState = it.columnState
+            )
+        }
+        composable(route = AuthenticationRoutes.googleSignIn) {
+            GoogleSignInScreen(
+                onAuthCancelled = navController::popBackStack,
+                onAuthSucceed = navController::popBackStack,
+                viewModel = hiltViewModel<AuthGoogleSignInViewModel>()
+            )
+        }
         scrollable(
             route = AuthenticationRoutes.email,
         ) {
